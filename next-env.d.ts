@@ -1,3 +1,2 @@
-// Stub file for Next.js types
-declare module 'next';
-declare module 'next/image';
+/// <reference types="next" />
+/// <reference types="next/image-types/global" />
