@@ -1,92 +1,126 @@
+# Обновим только src/app/page.tsx с типом для task
+page_tsx_fixed = """
+"use client"
+import { useEffect, useState } from 'react'
+import { Button } from "@/components/ui/button"
+import { Plus, CalendarCheck, Calendar, Inbox, Layers, CheckCircle, CalendarDays } from 'lucide-react'
 
-"use client";
-import React, { useEffect, useState } from "react";
-import { FaPlus, FaTrash, FaEdit, FaSave } from "react-icons/fa";
+const API = "https://taskdrop-render-backend.onrender.com"
 
-const API = "https://taskdrop-render-backend.onrender.com";
-
-export default function Home() {
-  const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState("");
-  const [editingId, setEditingId] = useState(null);
-  const [editingText, setEditingText] = useState("");
-
-  const userId = 1;
+export default function App() {
+  const [tasks, setTasks] = useState([])
+  const [newTask, setNewTask] = useState('')
+  const [activeTab, setActiveTab] = useState('all')
+  const userId = 1
 
   const fetchTasks = async () => {
-    const res = await fetch(`${API}/tasks?user_id=${userId}`);
-    const data = await res.json();
-    setTasks(data);
-  };
-
-  const addTask = async () => {
-    if (!newTask.trim()) return;
-    await fetch(`${API}/tasks`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: userId, text: newTask }),
-    });
-    setNewTask("");
-    fetchTasks();
-  };
-
-  const deleteTask = async (id: number) => {
-    await fetch(`${API}/tasks/${id}`, { method: "DELETE" });
-    fetchTasks();
-  };
-
-  const updateTask = async (id: number) => {
-    await fetch(`${API}/tasks/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ done: false, text: editingText }),
-    });
-    setEditingId(null);
-    fetchTasks();
-  };
+    const res = await fetch(`${API}/tasks?user_id=${userId}`)
+    const data = await res.json()
+    setTasks(data)
+  }
 
   useEffect(() => {
-    fetchTasks();
-  }, []);
+    fetchTasks()
+  }, [])
+
+  const handleAdd = async () => {
+    if (!newTask.trim()) return
+    await fetch(`${API}/tasks`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId, text: newTask })
+    })
+    setNewTask('')
+    fetchTasks()
+  }
+
+  const handleUpdate = async (id: number, done: boolean) => {
+    await fetch(`${API}/tasks/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ done: !done })
+    })
+    fetchTasks()
+  }
+
+  const handleEdit = async (id: number, newText: string) => {
+    await fetch(`${API}/tasks/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: newText })
+    })
+    fetchTasks()
+  }
+
+  const filteredTasks = tasks.filter((task: { id: number; text: string; done: boolean }) => {
+    if (activeTab === 'done') return task.done
+    if (activeTab === 'inbox') return !task.done
+    return true
+  })
+
+  const tabs = [
+    { key: 'all', label: 'Все', icon: <Layers className="h-5 w-5" /> },
+    { key: 'inbox', label: 'Входящие', icon: <Inbox className="h-5 w-5" /> },
+    { key: 'today', label: 'Сегодня', icon: <CalendarCheck className="h-5 w-5" /> },
+    { key: 'tomorrow', label: 'Завтра', icon: <Calendar className="h-5 w-5" /> },
+    { key: '7days', label: 'Следующие 7 дней', icon: <CalendarDays className="h-5 w-5" /> },
+    { key: 'done', label: 'Выполненные', icon: <CheckCircle className="h-5 w-5" /> },
+  ]
 
   return (
-    <main className="p-4 max-w-xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">📝 TaskDrop</h1>
-      <div className="flex gap-2 mb-6">
+    <div className="min-h-screen bg-black text-white p-4">
+      <h1 className="text-2xl font-bold mb-4">TaskDrop</h1>
+
+      <div className="flex gap-2 mb-4 overflow-x-auto">
+        {tabs.map(tab => (
+          <Button
+            key={tab.key}
+            variant={activeTab === tab.key ? 'default' : 'outline'}
+            onClick={() => setActiveTab(tab.key)}
+            className="flex items-center gap-2 shrink-0"
+          >
+            {tab.icon} {tab.label}
+          </Button>
+        ))}
+      </div>
+
+      <div className="flex gap-2 mb-4">
         <input
+          type="text"
+          placeholder="Новая задача..."
+          className="flex-1 bg-zinc-800 text-white px-3 py-2 rounded"
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
-          placeholder="Новая задача..."
-          className="flex-1 bg-[#1a1a1a] px-3 py-2 rounded text-white"
         />
-        <button onClick={addTask} className="bg-blue-600 p-3 rounded hover:bg-blue-700">
-          <FaPlus />
-        </button>
+        <Button onClick={handleAdd}><Plus className="w-4 h-4 mr-1" />Добавить</Button>
       </div>
+
       <div className="space-y-3">
-        {tasks.map((task) => (
-          <div key={task.id} className="bg-[#1A1A1A] p-4 rounded-xl flex justify-between items-center">
-            {editingId === task.id ? (
-              <>
-                <input
-                  value={editingText}
-                  onChange={(e) => setEditingText(e.target.value)}
-                  className="bg-black text-white border px-2 py-1 rounded w-full"
-                />
-                <button onClick={() => updateTask(task.id)} className="ml-2 text-green-400"><FaSave /></button>
-              </>
-            ) : (
-              <>
-                <span>{task.text}</span>
-                <div className="flex gap-3">
-                  <button onClick={() => { setEditingId(task.id); setEditingText(task.text); }} className="text-yellow-400"><FaEdit /></button>
-                  <button onClick={() => deleteTask(task.id)} className="text-red-500"><FaTrash /></button>
-                </div>
-              </>
-            )}
+        {filteredTasks.map((task: { id: number; text: string; done: boolean }) => (
+          <div key={task.id} className="flex items-center justify-between bg-zinc-800 px-4 py-2 rounded shadow">
+            <input
+              type="checkbox"
+              checked={task.done}
+              onChange={() => handleUpdate(task.id, task.done)}
+              className="mr-2"
+            />
+            <input
+              type="text"
+              value={task.text}
+              onChange={(e) => handleEdit(task.id, e.target.value)}
+              className="flex-1 bg-transparent text-white outline-none"
+            />
           </div>
         ))}
       </div>
-    </main>
-  );
+    </div>
+  )
 }
+"""
+
+# Сохраняем как page.tsx
+path = "/mnt/data/page.tsx"
+with open(path, "w") as f:
+    f.write(page_tsx_fixed)
+
+path
