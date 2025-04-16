@@ -1,5 +1,4 @@
-# Обновим только src/app/page.tsx с типом для task
-page_tsx_fixed = """
+
 "use client"
 import { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
@@ -116,11 +115,3 @@ export default function App() {
     </div>
   )
 }
-"""
-
-# Сохраняем как page.tsx
-path = "/mnt/data/page.tsx"
-with open(path, "w") as f:
-    f.write(page_tsx_fixed)
-
-path
