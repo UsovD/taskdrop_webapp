@@ -1,14 +1,13 @@
-import './globals.css';
 
 export const metadata = {
-  title: 'TaskDrop',
-  description: 'Task Manager',
+  title: "TaskDrop",
+  description: "UTasks style task manager",
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru">
-      <body className="bg-zinc-950 text-white p-4">{children}</body>
+    <html lang="en">
+      <body className="bg-[#0D0D0D] text-white font-sans">{children}</body>
     </html>
-  )
+  );
 }
