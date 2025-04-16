@@ -2,6 +2,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInbox, faCalendarDay, faCalendarPlus, faCalendarWeek, faCheck } from '@fortawesome/free-solid-svg-icons';
 
 const API_URL = "https://taskdrop-render-backend.onrender.com";
 
@@ -33,21 +35,30 @@ export default function Home() {
   return (
     <main>
       <div className="flex flex-wrap gap-2 mb-4">
-        <button className="bg-blue-600 px-3 py-1 rounded">📋 Все</button>
-        <button className="bg-orange-600 px-3 py-1 rounded">💬 Входящие</button>
-        <button className="bg-green-600 px-3 py-1 rounded">📅 Сегодня</button>
-        <button className="bg-pink-600 px-3 py-1 rounded">📅 Завтра</button>
-        <button className="bg-purple-600 px-3 py-1 rounded">📅 7 дней</button>
-        <button className="bg-gray-600 px-3 py-1 rounded">✅ Выполненные</button>
+        <button className="bg-blue-600 px-3 py-1 rounded text-white">
+          <FontAwesomeIcon icon={faInbox} className="mr-2" /> Входящие
+        </button>
+        <button className="bg-green-600 px-3 py-1 rounded text-white">
+          <FontAwesomeIcon icon={faCalendarDay} className="mr-2" /> Сегодня
+        </button>
+        <button className="bg-pink-600 px-3 py-1 rounded text-white">
+          <FontAwesomeIcon icon={faCalendarPlus} className="mr-2" /> Завтра
+        </button>
+        <button className="bg-purple-600 px-3 py-1 rounded text-white">
+          <FontAwesomeIcon icon={faCalendarWeek} className="mr-2" /> 7 дней
+        </button>
+        <button className="bg-gray-700 px-3 py-1 rounded text-white">
+          <FontAwesomeIcon icon={faCheck} className="mr-2" /> Выполненные
+        </button>
       </div>
 
-      <h1 className="text-3xl font-bold mb-4">Все</h1>
+      <h1 className="text-2xl font-bold mb-4">Все задачи</h1>
 
       <div className="mb-4">
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          className="bg-gray-800 border border-gray-600 px-3 py-2 rounded w-64"
+          className="bg-gray-800 border border-gray-600 px-3 py-2 rounded w-64 text-white"
           placeholder="Новая задача..."
         />
         <button onClick={addTask} className="ml-2 bg-blue-500 px-4 py-2 rounded text-white">
